@@ -52,8 +52,14 @@ bool lcd_print_repeat(){
 
 void lcd_print_measuring(){
   lcd.clear();
-  lcd_print(1, "Measuring...");
+  lcd_print(0, "Measuring...");
 }
+
+void lcd_print_counter(int value){
+  lcd.setCursor(0,1);
+  lcd.print(value); 
+  
+};
 
 void lcd_print_full(){
   lcd.clear();
@@ -84,10 +90,52 @@ void lcd_print_int_as_float(int value){
    lcd.print(val);
 }
 
-float lcd_get_sensor_height(){
+bool lcd_get_moving_platform(){
+  bool movingPlatform = false;
+  bool accepted=false;
+  bool selected = false;
+  lcd.clear();
+  lcd_print(0, ">Fixed");
+  lcd_print(1, " Kart ");
+  while(!accepted){
+   
+    lcd_key = lcd_read_button();
+    switch(lcd_key){
+      case btnUP:{
+        movingPlatform = false;
+        break;
+      }
+      case btnDOWN:{
+        movingPlatform = true;
+        break;
+      }
+      case btnSELECT:{
+        accepted = true;
+        break;
+      }
+    }
+
+    if(movingPlatform){
+      lcd_print(0, " ");
+      lcd_print(1, ">");
+    }else{
+      lcd_print(0, ">");
+      lcd_print(1, " ");
+    }
+    delay(500);
+    
+    
+  }
+  
+ 
+  return movingPlatform;  
+}
+
+
+float lcd_get_sensor_height(int default_height){
   bool accepted = false;
   bool pressed = false;
-  int value_cm = 800;
+  int value_cm = default_height;
   int lcd_delay = MAX_DELAY;
   lcd.clear();
   
