@@ -93,8 +93,9 @@ float sonic_sensor_average(){
     return (float) SONIC_BUFFER_AVG;
   }
   //return (float) SONIC_BUFFER_AVG;
-  quicksort(SONIC_BUFFER, 0, SONIC_BUFFER_USED - 1);
-  int drop = SONIC_BUFFER_USED * 0.1;
+  //quicksort(SONIC_BUFFER, 0, SONIC_BUFFER_USED - 1);
+  //int drop = SONIC_BUFFER_USED * 0.1;
+  int drop = 0;
   int i;
   float sum = 0;
   float count = 0;
