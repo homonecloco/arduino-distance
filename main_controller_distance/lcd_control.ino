@@ -111,6 +111,7 @@ bool lcd_get_moving_platform(){
       }
       case btnSELECT:{
         accepted = true;
+        delay(500);
         break;
       }
     }
@@ -122,7 +123,7 @@ bool lcd_get_moving_platform(){
       lcd_print(0, ">");
       lcd_print(1, " ");
     }
-    delay(500);
+    delay(50);
     
     
   }
@@ -180,7 +181,7 @@ float lcd_get_sensor_height(int default_height){
     } 
     delay(lcd_delay);
   }
-  return (float)value_cm/10;
+  return (float)value_cm/10.0;
 }
 
 bool lcd_print_distance(float distance){

@@ -2,10 +2,11 @@ int SONIC_EMIT[SONIC_SENSOR_MAX];
 int SONIC_ECHO[SONIC_SENSOR_MAX];
 int SONIC_BUFFER[SONIC_BUFFER_SIZE];
 int SONIC_BUFFER_USED = 0;
-long SONIC_BUFFER_AVG = 0;
+float SONIC_BUFFER_AVG = 0;
 int SONIC_ID = 0;
 float SONIC_SENSOR_OFFSET;
 
+bool SONIC_BUFFER_AVG_STORED = false;
 bool SONIC_BUFFER_OVERFLOW = false;
 void sonic_sensor_setup(int id, int emit, int echo){
 //  pinMode(port, INPUT);
@@ -43,6 +44,7 @@ void sonic_sensor_clear_buffer(){
   SONIC_BUFFER_USED = 0;
   SONIC_BUFFER_AVG =0;
   SONIC_BUFFER_OVERFLOW = false;
+  SONIC_BUFFER_AVG_STORED = false;
 }
 
 bool sonic_sensor_read(int id){
@@ -59,25 +61,22 @@ bool sonic_sensor_read(int id){
 
 void sonic_sensor_print_reads(){
   int i;
-//  Serial.print("ID");
-  Serial.print(SONIC_ID);
-  Serial.print("\n");
-  delay(500);
+ // Serial.print("ID");
+ // Serial.print(SONIC_ID);
+ // Serial.print("\n");
+  //delay(1000);
 //  Serial.print("AVG");
-  Serial.print(sonic_sensor_average());
-  Serial.print("\n");
-  delay(500);
+  //Serial.print(sonic_sensor_average());
+  //Serial.print("\n");
+  //delay(1000);
   for(i=0; i<SONIC_BUFFER_USED; i++){
     Serial.print((float)SONIC_BUFFER[i]/STORE_PRECISION);
     Serial.print(",");
   }
-  Serial.print(":\n");
- 
- 
-  delay(500);
-  Serial.print(SONIC_SENSOR_OFFSET);
-  Serial.print("\n");
-  
+  Serial.print(":\n"); 
+  delay(1000);
+  //Serial.print(SONIC_SENSOR_OFFSET);
+  //Serial.print("\n");
   SONIC_ID++;
 }
 
@@ -90,21 +89,39 @@ bool sonic_sensor_is_buffer_overflow(){
 }
 
 float sonic_sensor_average(){
+  if(SONIC_BUFFER_AVG_STORED){
+    return (float) SONIC_BUFFER_AVG;
+  }
   //return (float) SONIC_BUFFER_AVG;
   quicksort(SONIC_BUFFER, 0, SONIC_BUFFER_USED - 1);
   int drop = SONIC_BUFFER_USED * 0.1;
   int i;
-  int sum = 0;
-  int count = 0;
+  float sum = 0;
+  float count = 0;
   for(i = drop; i < SONIC_BUFFER_USED - drop; i++){
-    sum += SONIC_BUFFER[i];
-    count ++;
+    sum += (float)SONIC_BUFFER[i] /STORE_PRECISION;
+    count++;
   }
-
-  return ( (float)SONIC_SENSOR_OFFSET ) - ((float)sum/(float)count)  / STORE_PRECISION;
+  float diff = sum/count ;
+  
+//  Serial.print("\nSensor offset\n");
+//  Serial.print(SONIC_SENSOR_OFFSET);
+//  Serial.print("\nDiff\n");
+//  Serial.print(diff);
+//  Serial.print("\nPrecission\n");
+//  Serial.print(STORE_PRECISION);
+//  Serial.print("\nSum\n");
+//  Serial.print(sum);
+// Serial.print("\nCount\n");
+//  Serial.print(count);
+  
+  
+  SONIC_BUFFER_AVG = SONIC_SENSOR_OFFSET - diff ;
+  SONIC_BUFFER_AVG_STORED = true;
+  return SONIC_BUFFER_AVG;
 }
 
-void sonic_sensor_set_offset(int offset){
+void sonic_sensor_set_offset(float offset){
   SONIC_SENSOR_OFFSET = offset;
 }
 

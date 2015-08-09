@@ -46,6 +46,7 @@ void loop(){
 
 void loop_fixed(){
   if(button_is_pressed(btnTRIGGER)){
+    //Serial.print("\nIn the loop and pressed the button");
     lcd_print_measuring();
     //Throw the first to messures, as they tend to be errors. 
     sonic_sensor_read(0);
@@ -54,7 +55,7 @@ void loop_fixed(){
     for(i = 0; i < DEFAULT_MESSURES; i ++){
       lcd_print_counter(i);
       sonic_sensor_read(0);
-      delay(10);
+      //delay(10);
       sonic_sensor_read(1);
       delay(10);
     }
@@ -64,12 +65,14 @@ void loop_fixed(){
       lcd_print_processing();
       sonic_sensor_print_reads();
     }
+    sonic_sensor_clear_buffer();
     lcd_print_waiting(); 
   }
 }
 
 void loop_kart() {
   if(button_is_pressed(btnTRIGGER)){
+
     if(lcd_refresh){
        lcd_print_measuring();
        lcd_refresh=false;
