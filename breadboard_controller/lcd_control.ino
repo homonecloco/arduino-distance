@@ -101,6 +101,12 @@ void lcd_print_waiting(){
   lcd_print(1, "red button");
 }
 
+void lcd_print_still(){
+  lcd_clear();
+  lcd_print(0,"Moving sensor");
+  lcd_print(1, "");
+}
+
 void lcd_print_int_as_float(int value){
    float val = (float)value / 10.0;
    lcd_setCursor(0,1);
@@ -210,37 +216,13 @@ bool lcd_print_distance(float distance){
   bool readed = false;
   bool result = false;
   lcd_clear();
-  lcd_print("Save? ");
+  lcd_print("Distance: ");
   lcd_8574.print(distance); 
   lcd_setCursor(0,1);
-  lcd_print("(Y:up/N:down)");
   
-  while(!readed){
-    lcd_key = lcd_read_button();
-    switch(lcd_key){
-      case btnUP:{
-        result = true;
-        readed = true;
-        break;
-      }
-      case btnDOWN:{
-        readed = true;
-      }
-    }
-  }
-  
-  lcd_clear();
-  lcd_setCursor(0,0);
-  if(result){
-    lcd_print("Saving          ");
-  }else{
-   lcd_print("Discarded       ");
-  }
-  lcd_setCursor(0,1);
-  lcd_8574.print(distance);
-  //display_pressed_button();
   return result;
 }
+
 
 void lcd_pressed_button(){
  //lcd.setCursor(9,1);            // move cursor to second line "1" and 9 spaces over
@@ -284,5 +266,39 @@ void lcd_pressed_button(){
      }
  }
 
+}
+
+void lcd_gyro_calibrate(){
+  bool accepted = false;
+  bool pressed = false;
+  int lcd_delay = MAX_DELAY;
+  int lcd_key;
+  
+  lcd_clear();
+  lcd_print(0, "keep the bar");
+  lcd_print(1, "still & press up" );
+  
+  while(!accepted){
+    
+    lcd_key = lcd_read_button();
+    switch (lcd_key){
+       case btnLEFT:{
+        break;
+      }
+      case btnSELECT:{
+        accepted=true ;
+        lcd_clear();
+        lcd_print(0, "Calibrating");
+        lcd_print(1, "gyroscope" );
+        gyro.zeroCalibrate(200,10);//sample 200 times to calibrate and it will take 200*10ms 
+        break;
+      }
+      case btnNONE:{
+         lcd_delay = MAX_DELAY;
+        break;
+      }
+    } 
+  }
+  return;
 }
 
